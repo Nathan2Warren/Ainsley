@@ -51,4 +51,3 @@ class GraphQLClient:
 if __name__ == "__main__":
     client = GraphQLClient()
     profiles = client._get_data_for_all_profiles()
-    
