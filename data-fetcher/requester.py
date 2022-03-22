@@ -47,7 +47,6 @@ class GraphQLClient:
         profile_data = self._get_data_for_all_profiles()
         _ids = [elem['id'] for elem in profile_data]
         return _ids if num is None else _ids[:num]
-        
 
 if __name__ == "__main__":
     client = GraphQLClient()
