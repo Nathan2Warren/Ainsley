@@ -77,3 +77,26 @@ profile_query = '''query Profiles($request: ProfileQueryRequest!) {
   }
 }
 '''
+
+global_protocol_stats_query = '''
+  query GlobalProtocolStats($request: GlobalProtocolStatsRequest) {
+    globalProtocolStats(request: $request) {
+      totalProfiles
+      totalBurntProfiles
+      totalPosts
+      totalMirrors
+      totalComments
+      totalCollects
+      totalFollows
+      totalRevenue {
+        asset {
+          name
+          symbol
+          decimals
+          address
+        }
+        value
+      }
+    }
+  }
+'''
