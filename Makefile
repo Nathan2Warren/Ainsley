@@ -1,16 +1,14 @@
-SHELL=/bin/bash
+SHELL := /bin/bash
 
 env_name = ainsley
+CONDA_ACTIVATE=source $$(conda info --base)/etc/profile.d/conda.sh ; conda activate ; conda activate
 
-install-kernel:
+
+install:
 	conda create -n ${env_name} python=3.8 -y
-	python -m ipykernel install --user --name ${env_name} --display-name "${env_name}"
-
-install-conda:
-	make install-kernel
 
 install-reqs:
-	pip install -r requirements.txt
-	
+	pip install --upgrade pip &&\
+			pip install -r requirements.txt
 	
 
