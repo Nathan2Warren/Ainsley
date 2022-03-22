@@ -4,6 +4,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 import dash
+from views import home, page1, page2, page3, page4
 
 # Own packages (must be in same directory as index.py)
 from app import app
@@ -26,7 +27,13 @@ app.layout = html.Div(
                 [
                     dbc.NavbarBrand(
                         [
-                            "Dashboard",
+                            html.Img(
+                            src = "assets/lens.ico",
+                            height = "30px",
+                            className = "d-inline-block align-top",
+                            ),
+
+                            " Lens Dashboard",
                         ],
                         className="ml-2",
                         external_link=False,
@@ -37,36 +44,29 @@ app.layout = html.Div(
                             dbc.NavItem(dbc.NavLink("Home", href="/", active="exact")),
                             dbc.NavItem(
                                 dbc.NavLink(
-                                    "1",
-                                    href="/1",
+                                    "page1",
+                                    href="/page1",
                                     active="exact",
                                 )
                             ),
                             dbc.NavItem(
                                 dbc.NavLink(
-                                    "2",
-                                    href="/2",
+                                    "page2",
+                                    href="/page2",
                                     active="exact",
                                 )
                             ),
                             dbc.NavItem(
                                 dbc.NavLink(
-                                    "3",
-                                    href="/3",
+                                    "page3",
+                                    href="/page3",
                                     active="exact",
                                 )
                             ),
                             dbc.NavItem(
                                 dbc.NavLink(
-                                    "4",
-                                    href="/4",
-                                    active="exact",
-                                )
-                            ),
-                            dbc.NavItem(
-                                dbc.NavLink(
-                                    "5",
-                                    href="/5",
+                                    "page4",
+                                    href="/page4",
                                     active="exact",
                                 )
                             ),
@@ -83,5 +83,29 @@ app.layout = html.Div(
     ],
     className="dash-bootstrap",
 )
+
+@app.callback(
+    Output(component_id="page-content", component_property="children"),
+    Input(component_id="url", component_property="pathname"),
+)
+def display_page(pathname):
+    if pathname == "/":
+        return home.layout
+    if pathname == "/page1":
+        return page1.layout
+    if pathname == "/page2":
+        return page2.layout
+    if pathname == "/page3":
+        return page3.layout
+    if pathname == "/page4":
+        return page4.layout
+    if pathname == "/page5":
+        return page5.layout
+    else:
+        return html.Div(
+            [html.H1("404: Page Not Found", className="jumbotron-heading")],
+            style={"textAlign": "center", "margin-top": 255},
+        )
+
 if __name__ == "__main__":
     server.run(debug=True, host="0.0.0.0", port="80")
