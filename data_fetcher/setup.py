@@ -8,5 +8,5 @@ setup(
     description="ainsley report",
     author="daboyz",
     packages=["data_fetcher"],
-    install_requires=["requests"],
+    install_requires=["requests"]
 )

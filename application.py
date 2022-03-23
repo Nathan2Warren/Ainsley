@@ -111,4 +111,4 @@ def display_page(pathname):
 
 
 if __name__ == "__main__":
-    server.run(debug=True, host="0.0.0.0", port="80")
+    app.run_server(debug=True, host="127.0.0.1", port="80")
