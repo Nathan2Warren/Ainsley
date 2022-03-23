@@ -1,6 +1,7 @@
 import json
 import requests
 from pandas import json_normalize
+from typing import Union
 
 from .queries import (
     global_protocol_stats_query,
@@ -48,7 +49,9 @@ class GraphQLClient:
                             "cursor": _next
                         }
                     })
-            response = requests.post(cls.url, json={'query' : profile_query, 'variables' : variables})
+            response = requests.post(
+                cls.url, json={'query' : profile_query, 'variables' : variables}
+            )
             if response.status_code == 200:
                 content = json.loads(response.content)
                 profiles = content["data"]["profiles"]
@@ -67,12 +70,14 @@ class GraphQLClient:
         return _ids if num is None else _ids[:num]
 
     @classmethod
-    def get_profile_revenues(cls, profile_ids, normalize: bool=False):
+    def get_profile_revenues(cls, profile_ids: Union[list, str], normalize: bool=False):
         if isinstance(profile_ids, str):
             profile_ids = [profile_ids]
         query_payload = ",".join([profile_revenue_query.format(f'prorev_{pid}', pid) for pid in profile_ids])
         query_string = f'query Items {{{query_payload}}}'
-        response = requests.post(cls.url, json={'query' : query_string}) # , 'variables' : variables
+        response = requests.post(
+            cls.url, json={'query' : query_string}
+        )
         if response.status_code == 200:
             content = json.loads(response.content)
             profile_revenues = content['data']
@@ -111,7 +116,9 @@ class GraphQLClient:
                             "cursor" : _next
                         }
                     })
-            response = requests.post(cls.url, json={'query' : publications_query, 'variables' : variables})
+            response = requests.post(
+                cls.url, json={'query' : publications_query, 'variables' : variables}
+            )
             if response.status_code == 200:
                 content = json.loads(response.content)
                 publications.extend(content['data']['publications']['items'])
@@ -121,8 +128,3 @@ class GraphQLClient:
             else:
                 raise Exception(response.content.decode())
         return json_normalize(publications) if normalize else publications
-
-    
-if __name__ == "__main__":
-    profile_ids = GraphQLClient.get_existing_profile_ids()
-    profile_revenues = GraphQLClient.get_profile_revenues(profile_ids)
