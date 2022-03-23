@@ -1,4 +1,4 @@
-profile_query = '''query Profiles($request: ProfileQueryRequest!) {
+profile_query = """query Profiles($request: ProfileQueryRequest!) {
   profiles(request: $request) {
     items {
       id
@@ -76,9 +76,9 @@ profile_query = '''query Profiles($request: ProfileQueryRequest!) {
     }
   }
 }
-'''
+"""
 
-global_protocol_stats_query = '''
+global_protocol_stats_query = """
   query GlobalProtocolStats($request: GlobalProtocolStatsRequest) {
     globalProtocolStats(request: $request) {
       totalProfiles
@@ -99,4 +99,4 @@ global_protocol_stats_query = '''
       }
     }
   }
-'''
+"""

@@ -9,12 +9,7 @@ layout = html.Div(
                     className="jumbotron-heading",
                 ),
                 html.P(
-                    "Description 1. "
-                    "Desc 2 "
-                    "Desc 3 "
-                    "Desc 4 "
-                    "Desc 5 "
-                    "Desc 6",
+                    "Description 1. " "Desc 2 " "Desc 3 " "Desc 4 " "Desc 5 " "Desc 6",
                     className="lead text-muted",
                 ),
             ],

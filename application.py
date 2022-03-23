@@ -1,15 +1,15 @@
 # Python packages
+import os
+
+import dash
+import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-import dash_bootstrap_components as dbc
-import dash
-from views import home, page1, page2, page3, page4
 
 # Own packages (must be in same directory as index.py)
-from app import app
-from app import server
-import os
+from app import app, server
+from views import home, page1, page2, page3, page4
 
 server = app.server
 
@@ -28,11 +28,10 @@ app.layout = html.Div(
                     dbc.NavbarBrand(
                         [
                             html.Img(
-                            src = "assets/lens.ico",
-                            height = "30px",
-                            className = "d-inline-block align-top",
+                                src="assets/lens.ico",
+                                height="30px",
+                                className="d-inline-block align-top",
                             ),
-
                             " Lens Dashboard",
                         ],
                         className="ml-2",
@@ -84,6 +83,7 @@ app.layout = html.Div(
     className="dash-bootstrap",
 )
 
+
 @app.callback(
     Output(component_id="page-content", component_property="children"),
     Input(component_id="url", component_property="pathname"),
@@ -106,6 +106,7 @@ def display_page(pathname):
             [html.H1("404: Page Not Found", className="jumbotron-heading")],
             style={"textAlign": "center", "margin-top": 255},
         )
+
 
 if __name__ == "__main__":
     server.run(debug=True, host="0.0.0.0", port="80")
