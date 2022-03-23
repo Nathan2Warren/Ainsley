@@ -5,7 +5,8 @@ from .queries import (
     global_protocol_stats_query,
     profile_query,
     publications_query,
-    profile_revenue_query
+    profile_revenue_query,
+    publication_revenue_query
 )
 class GraphQLClient:
 
@@ -81,25 +82,20 @@ class GraphQLClient:
     
     @classmethod
     def get_publication_revenue(cls, publication_id: str):
-        return {
-                "data": {
-                    "publicationRevenue": {
-                    "publication": {
-                        "id": "0x12-0x05"
-                    },
-                    "earnings": {
-                        "asset": {
-                            "name": "Wrapped Matic",
-                            "symbol": "WMATIC",
-                            "decimals": 18,
-                            "address": "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889"
-                        },
-                        "value": "0.0001"
-                    },
-                    "protocolFee": 0
-                    }
-                }
-            }
+        variables = json.dumps({
+                        "request": {
+                            "publicationId": publication_id
+                        }
+                    })
+        response = requests.post(
+            cls.url, json={'query' : publication_revenue_query, 'variables' : variables}
+        )
+        if response.status_code == 200:
+            content = json.loads(response.content)
+            revenue_data = content["data"]["publicationRevenue"]
+            return revenue_data
+        else:
+            raise Exception(response.content.decode())            
 
     @classmethod
     def get_publications(cls, profile_id: str, limit: int=50):
