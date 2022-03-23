@@ -1,31 +1,33 @@
 import requests
 import json
-from queries import profile_query, global_protocol_stats_query, publications_query
+from queries import profile_query, global_protocol_stats_query, publications_query, profile_revenue_query
 
 class GraphQLClient:
 
-    def __init__(self):
-        self.url = 'https://api-mumbai.lens.dev'
+    url = 'https://api-mumbai.lens.dev'
 
-    def __get_number_of_profile_ids(self):
-        response = requests.post(self.url, json={'query' : global_protocol_stats_query})
+    @classmethod
+    def __get_number_of_profile_ids(cls):
+        response = requests.post(cls.url, json={'query' : global_protocol_stats_query})
         if response.status_code == 200:
             content = json.loads(response.content)
             return content['data']['globalProtocolStats']['totalProfiles']
         else:
-            raise Exception(response.content)
+            raise Exception(response.content.decode())
         
-    def __get_valid_profile_ids(self):
-        profile_count = self.__get_number_of_profile_ids()
+    @classmethod
+    def __get_valid_profile_ids(cls):
+        profile_count = cls.__get_number_of_profile_ids()
         profile_ids = ["{0:02x}".format(i) for i in range(profile_count + 1)]
         profile_ids = map(lambda x: x.zfill(len(x)+1) if len(x)  % 2 != 0 else x, profile_ids)
         profile_ids = [f'0x{n}' for n in profile_ids]
         return profile_ids
         
-    def _get_data_for_all_profiles(self, limit: int=50):
+    @classmethod
+    def _get_data_for_all_profiles(cls, limit: int=50):
         profiles_data = []
         prev, _next = None, "0"
-        profile_ids = self.__get_valid_profile_ids()
+        profile_ids = cls.__get_valid_profile_ids()
         while prev != _next:
             variables = json.dumps({
                         "request": {
@@ -34,7 +36,7 @@ class GraphQLClient:
                             "cursor": _next
                         }
                     })
-            response = requests.post(self.url, json={'query' : profile_query, 'variables' : variables})
+            response = requests.post(cls.url, json={'query' : profile_query, 'variables' : variables})
             if response.status_code == 200:
                 content = json.loads(response.content)
                 profiles = content['data']['profiles']
@@ -43,45 +45,32 @@ class GraphQLClient:
                 prev = profiles['pageInfo']['prev']
                 _next = profiles['pageInfo']['next']
             else:
-                raise Exception(response.content)
+                raise Exception(response.content.decode())
         return profiles_data
     
-    def get_existing_profile_ids(self, num=None):
-        profile_data = self._get_data_for_all_profiles()
+    @classmethod
+    def get_existing_profile_ids(cls, num=None):
+        profile_data = cls._get_data_for_all_profiles()
         _ids = [elem['id'] for elem in profile_data]
         return _ids if num is None else _ids[:num]
 
-    def get_profile_revenue(self, profile_id: str):
-        return {
-                "data": {
-                    "profileRevenue": {
-                    "items": [
-                        {
-                        "publication": {
-                            "id": "0x12-0x05"
-                        },
-                        "earnings": {
-                            "asset": {
-                            "name": "Wrapped Matic",
-                            "symbol": "WMATIC",
-                            "decimals": 18,
-                            "address": "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889"
-                            },
-                            "value": "0.0001"
-                        },
-                        "protocolFee": 0
-                        }
-                    ],
-                    "pageInfo": {
-                        "next": "{\"entityIdentifier\":\"0x12-0x05\",\"timestamp\":1647701744,\"cursorDirection\":\"AFTER\"}",
-                        "prev": "{\"entityIdentifier\":\"0x12-0x05\",\"timestamp\":1647701744,\"cursorDirection\":\"BEFORE\"}",
-                        "totalCount": 1
-                        }
-                    }
-                }
-            }
+    @classmethod
+    def get_profile_revenues(cls, profile_ids):
+        if isinstance(profile_ids, str):
+            profile_ids = [profile_ids]
+        query_payload = ",".join([profile_revenue_query.format(f'prorev_{pid}', pid) for pid in profile_ids])
+        query_string = f'query Items {{{query_payload}}}'
+        response = requests.post(cls.url, json={'query' : query_string}) # , 'variables' : variables
+        if response.status_code == 200:
+            content = json.loads(response.content)
+            profile_revenues = content['data']
+            profile_revs = [v['items'] for k, v in profile_revenues.items() if len(v['items']) > 0]
+            return profile_revs
+        else:
+            raise Exception(response.content.decode())
     
-    def get_publication_revenue(self, publication_id: str):
+    @classmethod
+    def get_publication_revenue(cls, publication_id: str):
         return {
                 "data": {
                     "publicationRevenue": {
@@ -102,25 +91,31 @@ class GraphQLClient:
                 }
             }
 
-    def get_publications(self, profile_id: str, limit: int=50):
-        variables = json.dumps({
-                    "request": {
-                        "profileId": profile_id,
-                        "publicationTypes": ["POST", "COMMENT", "MIRROR"],
-                        "limit": limit
-                    }
-                })
-        response = requests.post(self.url, json={'query' : publications_query, 'variables' : variables})
-        if response.status_code == 200:
-            content = json.loads(response.content)
-            publications = content['data']['publications']['items']
-            return publications
-        else:
-            raise Exception(response.content)
+    @classmethod
+    def get_publications(cls, profile_id: str, limit: int=50):
+        publications = []
+        prev, _next = None, "0"
+        while prev != _next:
+            variables = json.dumps({
+                        "request": {
+                            "profileId": profile_id,
+                            "publicationTypes": ["POST", "COMMENT", "MIRROR"],
+                            "limit": limit,
+                            "cursor" : _next
+                        }
+                    })
+            response = requests.post(cls.url, json={'query' : publications_query, 'variables' : variables})
+            if response.status_code == 200:
+                content = json.loads(response.content)
+                publications.extend(content['data']['publications']['items'])
+                
+                page_info = content['data']['publications']["pageInfo"]
+                prev, _next = page_info['prev'], page_info['next']
+            else:
+                raise Exception(response.content.decode())
+        return publications
         
     
 if __name__ == "__main__":
-    client = GraphQLClient()
-    # profiles = client._get_data_for_all_profiles()
-    publications = client.get_publications(profile_id='0x3b')
-    
+    profile_ids = GraphQLClient.get_existing_profile_ids()
+    profile_revenues = GraphQLClient.get_profile_revenues(profile_ids)

@@ -79,39 +79,36 @@ profile_query = '''query Profiles($request: ProfileQueryRequest!) {
 '''
 
 profile_revenue_query = '''
-  query Items($request: ProfileRevenueQueryRequest!) {
-    profileRevenue(request: $request) {
-      items {
-        publication {
-          ... on Post {
-            id
-          }
-          ... on Comment {
-            id
-          }
-          ... on Mirror {
-            id
-          }
-        }
-        earnings {
-          asset {
-            name
-            symbol
-            decimals
-            address
-          }
-          value
-        }
+  {0}: profileRevenue(request: {{profileId: "{1}"}}) {{
+    items {{
+        publication {{
+            ... on Post {{
+                id
+            }}
+            ... on Comment {{
+                id
+            }}
+            ... on Mirror {{
+                id
+            }}
+        }}
+        earnings {{
+            asset {{
+                name
+                symbol
+                decimals
+                address
+            }}
+            value
+        }}
         protocolFee
-      }
-      pageInfo {
+    }}
+    pageInfo {{
         next
         prev
         totalCount
-      }
-    }
-  }
-'''
+    }}
+}}'''
 
 publications_query = '''
 query Publications($request: PublicationsQueryRequest!) {
