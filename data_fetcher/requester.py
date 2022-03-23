@@ -1,7 +1,6 @@
 import requests
 import json
 from queries import profile_query, global_protocol_stats_query, publications_query
-from typing import List, Dict
 
 class GraphQLClient:
 
