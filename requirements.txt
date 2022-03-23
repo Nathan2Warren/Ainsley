@@ -2,7 +2,7 @@ dash_core_components
 dash_html_components
 dash
 dash_bootstrap_components
-ipykernel
-black
+black==22.1.0
 numpy
 pandas
+pre-commit

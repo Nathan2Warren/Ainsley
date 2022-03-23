@@ -10,5 +10,6 @@ install:
 install-reqs:
 	pip install --upgrade pip &&\
 			pip install -r requirements.txt
-	
+	pre-commit install
+
 
