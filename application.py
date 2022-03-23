@@ -40,7 +40,9 @@ app.layout = html.Div(
                     ),
                     dbc.Nav(
                         [
-                            dbc.NavItem(dbc.NavLink("Home", href="/", active="exact")),
+                            dbc.NavItem(
+                                dbc.NavLink("Home", href="/", active="exact")
+                            ),
                             dbc.NavItem(
                                 dbc.NavLink(
                                     "page1",
@@ -78,7 +80,9 @@ app.layout = html.Div(
             sticky="top",
         ),
         dcc.Location(id="url", refresh=False),
-        html.Div(id="page-content", className="container pt-5", style=CONTENT_STYLE),
+        html.Div(
+            id="page-content", className="container pt-5", style=CONTENT_STYLE
+        ),
     ],
     className="dash-bootstrap",
 )
@@ -99,8 +103,6 @@ def display_page(pathname):
         return page3.layout
     if pathname == "/page4":
         return page4.layout
-    if pathname == "/page5":
-        return page5.layout
     else:
         return html.Div(
             [html.H1("404: Page Not Found", className="jumbotron-heading")],
