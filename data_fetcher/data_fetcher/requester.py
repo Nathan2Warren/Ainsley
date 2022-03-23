@@ -1,17 +1,24 @@
-import requests
 import json
-from queries import profile_query, global_protocol_stats_query, publications_query, profile_revenue_query
+import requests
 
+from .queries import (
+    global_protocol_stats_query,
+    profile_query,
+    publications_query,
+    profile_revenue_query
+)
 class GraphQLClient:
 
     url = 'https://api-mumbai.lens.dev'
 
     @classmethod
     def __get_number_of_profile_ids(cls):
-        response = requests.post(cls.url, json={'query' : global_protocol_stats_query})
+        response = requests.post(
+            cls.url, json={'query' : global_protocol_stats_query}
+        )
         if response.status_code == 200:
             content = json.loads(response.content)
-            return content['data']['globalProtocolStats']['totalProfiles']
+            return content["data"]["globalProtocolStats"]["totalProfiles"]
         else:
             raise Exception(response.content.decode())
         
@@ -19,8 +26,11 @@ class GraphQLClient:
     def __get_valid_profile_ids(cls):
         profile_count = cls.__get_number_of_profile_ids()
         profile_ids = ["{0:02x}".format(i) for i in range(profile_count + 1)]
-        profile_ids = map(lambda x: x.zfill(len(x)+1) if len(x)  % 2 != 0 else x, profile_ids)
-        profile_ids = [f'0x{n}' for n in profile_ids]
+        profile_ids = map(
+            lambda x: x.zfill(len(x) + 1) if len(x) % 2 != 0 else x,
+            profile_ids,
+        )
+        profile_ids = [f"0x{n}" for n in profile_ids]
         return profile_ids
         
     @classmethod
@@ -39,11 +49,11 @@ class GraphQLClient:
             response = requests.post(cls.url, json={'query' : profile_query, 'variables' : variables})
             if response.status_code == 200:
                 content = json.loads(response.content)
-                profiles = content['data']['profiles']
-                profiles_data.extend(profiles['items'])
-                
-                prev = profiles['pageInfo']['prev']
-                _next = profiles['pageInfo']['next']
+                profiles = content["data"]["profiles"]
+                profiles_data.extend(profiles["items"])
+
+                prev = profiles["pageInfo"]["prev"]
+                _next = profiles["pageInfo"]["next"]
             else:
                 raise Exception(response.content.decode())
         return profiles_data
@@ -79,10 +89,10 @@ class GraphQLClient:
                     },
                     "earnings": {
                         "asset": {
-                        "name": "Wrapped Matic",
-                        "symbol": "WMATIC",
-                        "decimals": 18,
-                        "address": "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889"
+                            "name": "Wrapped Matic",
+                            "symbol": "WMATIC",
+                            "decimals": 18,
+                            "address": "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889"
                         },
                         "value": "0.0001"
                     },
@@ -114,7 +124,7 @@ class GraphQLClient:
             else:
                 raise Exception(response.content.decode())
         return publications
-        
+
     
 if __name__ == "__main__":
     profile_ids = GraphQLClient.get_existing_profile_ids()
