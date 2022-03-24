@@ -40,9 +40,7 @@ app.layout = html.Div(
                     ),
                     dbc.Nav(
                         [
-                            dbc.NavItem(
-                                dbc.NavLink("Home", href="/", active="exact")
-                            ),
+                            dbc.NavItem(dbc.NavLink("Home", href="/", active="exact")),
                             dbc.NavItem(
                                 dbc.NavLink(
                                     "page1",
@@ -80,9 +78,7 @@ app.layout = html.Div(
             sticky="top",
         ),
         dcc.Location(id="url", refresh=False),
-        html.Div(
-            id="page-content", className="container pt-5", style=CONTENT_STYLE
-        ),
+        html.Div(id="page-content", className="container pt-5", style=CONTENT_STYLE),
     ],
     className="dash-bootstrap",
 )
@@ -111,4 +107,4 @@ def display_page(pathname):
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True, host="127.0.0.1", port="80")
+    app.run_server(debug=True, host="0.0.0.0", port="8080")
