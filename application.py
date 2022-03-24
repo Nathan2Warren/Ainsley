@@ -13,12 +13,29 @@ from views import home, page1, page2, page3, page4
 
 server = app.server
 
-CONTENT_STYLE = {
+CONTENT_STYLE_DIV = {
     "margin": "auto",
     "padding": "2rem 1rem",
     "max-width": "100%",
     "max-height": "10%",
 }
+
+SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "16rem",
+    "padding": "2rem 1rem",
+    "background-color": "#f8f9fa",
+}
+
+CONTENT_STYLE_SIDEBAR = {
+    "margin-left": "18rem",
+    "margin-right": "2rem",
+    "padding": "2rem 1rem",
+}
+
 
 app.layout = html.Div(
     [
@@ -75,10 +92,10 @@ app.layout = html.Div(
                 ],
                 className="container",
             ),
-            sticky="top",
+            sticky="left",
         ),
         dcc.Location(id="url", refresh=False),
-        html.Div(id="page-content", className="container pt-5", style=CONTENT_STYLE),
+        html.Div(id="page-content", className="container pt-5", style=CONTENT_STYLE_DIV),
     ],
     className="dash-bootstrap",
 )
