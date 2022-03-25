@@ -1,3 +1,6 @@
+from datetime import datetime as dt
+from datetime import timedelta
+
 import dash
 import dash_bootstrap_components as dbc
 import pandas as pd
@@ -30,6 +33,19 @@ layout = (
                         ),
                         dbc.Row(
                             [
+                                dbc.Label("Date range", html_for="date_picker_range"),
+                                dcc.DatePickerRange(
+                                    id="date_picker_range",
+                                    start_date="2022-03-17",
+                                    end_date=str(dt.today()),
+                                    with_portal=False,
+                                    first_day_of_week=0,
+                                    style={},
+                                ),
+                            ],
+                        ),
+                        dbc.Row(
+                            [
                                 dcc.Loading(
                                     id="post_history",
                                     children=[
@@ -45,9 +61,15 @@ layout = (
                     [
                         html.Br(),
                         dcc.Loading(
-                            id="post_history",
+                            id="timeseries_new_users",
                             children=[
-                                dcc.Graph(id="post_history", config={"displayModeBar": False}),
+                                dcc.Graph(id="timeseries_new_users", config={"displayModeBar": False}),
+                            ],
+                        ),
+                        dcc.Loading(
+                            id="timeseries_cum_users",
+                            children=[
+                                dcc.Graph(id="timeseries_cum_users", config={"displayModeBar": False}),
                             ],
                         ),
                     ],
@@ -77,7 +99,7 @@ def update_profile_id_select(profile_options):
 )
 def update_post_history_graph(profile_id):
 
-    df = f.GraphQLClient.get_publications(profile_id=profile_id)
+    df = f.GraphQLClient.get_publications_by_profile(profile_id=profile_id)
     df["createdAt"] = pd.to_datetime(df["createdAt"])
     counts = df.groupby([pd.Grouper(key="createdAt", freq="D")]).size()
 
@@ -93,12 +115,14 @@ def update_post_history_graph(profile_id):
 
 
 @app.callback(
-    Output("post_history", "figure"),
+    Output("timeseries_new_users", "figure"),
+    Output("timeseries_cum_users", "figure"),
     [
-        Input("profile_options", "value"),
+        Input("date_picker_range", "value"),
+        Input("date_picker_range", "value"),
     ],
 )
-def update_post_history_graph(profile_id):
+def update_timeseries_users(profile_id):
 
     df = f.GraphQLClient.get_profile_revenues(profile_id=profile_id)
     df["createdAt"] = pd.to_datetime(df["createdAt"])
