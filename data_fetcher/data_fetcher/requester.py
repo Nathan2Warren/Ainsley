@@ -1,4 +1,6 @@
 import json
+import time
+from datetime import datetime
 from typing import Union
 
 import requests
@@ -86,18 +88,16 @@ class GraphQLClient:
 
     @classmethod
     def get_timeseries(cls, start, end):
-        q = ",".join([profile_timeseries.format(start, end) for start, end in zip(start, end)])
-        print(q)
-        response = requests.post(cls.url, json={q})
+        start_unix = convert_datetime_to_unix(start)
+        end_unix = convert_datetime_to_unix(end)
+        query = profile_timeseries.format(start_unix, end_unix)
+        # query = ",".join([profile_timeseries.format(start_unix, end_unix) for start_unix, end_unix in zip(start_unix, end_unix)])
+        response = requests.post(cls.url, json={"query": query})
         if response.status_code == 200:
             content = json.loads(response.content)
-            ts = content["data"]
-
-            data = []
-            for k, v in ts.items():
-                if len(v["items"]) > 0:
-                    data.extend(v["items"])
-            df = json_normalize(data)
+            df = json_normalize(content)
+            df["start"] = start
+            df["end"] = end
             return df
         else:
             raise Exception(response.content.decode())
@@ -138,3 +138,9 @@ class GraphQLClient:
             else:
                 raise Exception(response.content.decode())
         return json_normalize(publications)
+
+
+def convert_datetime_to_unix(d: str):
+    unix_timestamp = int(time.mktime(datetime.fromisoformat(d).timetuple()))
+    # unix_timestamp_list =[int(time.mktime(datetime.fromisoformat(x).timetuple())) for x in d]
+    return unix_timestamp

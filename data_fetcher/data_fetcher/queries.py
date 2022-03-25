@@ -489,8 +489,8 @@ profile_revenue_query = """
 profile_timeseries = """
 query GlobalProtocolStats {{
   globalProtocolStats(request: {{
-    fromTimestamp: {0},
-    toTimestamp: {1}
+    fromTimestamp: "{0}",
+    toTimestamp: "{1}"
   }}) {{
     totalProfiles
     totalBurntProfiles
