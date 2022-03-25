@@ -1,4 +1,4 @@
-profile_query = '''query Profiles($request: ProfileQueryRequest!) {
+profile_query = """query Profiles($request: ProfileQueryRequest!) {
   profiles(request: $request) {
     items {
       id
@@ -76,9 +76,9 @@ profile_query = '''query Profiles($request: ProfileQueryRequest!) {
     }
   }
 }
-'''
+"""
 
-profile_revenue_query = '''
+profile_revenue_query = """
   {0}: profileRevenue(request: {{profileId: "{1}"}}) {{
     items {{
         publication {{
@@ -108,13 +108,13 @@ profile_revenue_query = '''
         prev
         totalCount
     }}
-}}'''
+}}"""
 
-publications_query = '''
+publications_query = """
 query Publications($request: PublicationsQueryRequest!) {
   publications(request: $request) {
     items {
-      __typename 
+      __typename
       ... on Post {
         ...PostFields
       }
@@ -202,7 +202,7 @@ fragment ProfileFields on Profile {
   }
 }
 
-fragment PublicationStatsFields on PublicationStats { 
+fragment PublicationStatsFields on PublicationStats {
   totalAmountOfMirrors
   totalAmountOfCollects
   totalAmountOfComments
@@ -339,10 +339,10 @@ fragment MirrorFields on Mirror {
   ...MirrorBaseFields
   mirrorOf {
    ... on Post {
-      ...PostFields          
+      ...PostFields
    }
    ... on Comment {
-      ...CommentFields          
+      ...CommentFields
    }
   }
 }
@@ -380,10 +380,10 @@ fragment CommentFields on Comment {
       ...MirrorBaseFields
       mirrorOf {
         ... on Post {
-           ...PostFields          
+           ...PostFields
         }
         ... on Comment {
-           ...CommentMirrorOfFields        
+           ...CommentMirrorOfFields
         }
       }
     }
@@ -401,8 +401,8 @@ fragment CommentMirrorOfFields on Comment {
     }
   }
 }
-'''
-publication_revenue_query = '''
+"""
+publication_revenue_query = """
   query PublicationRevenue($request: PublicationRevenueQueryRequest!) {
     publicationRevenue(request: $request) {
       publication {
@@ -428,9 +428,9 @@ publication_revenue_query = '''
       protocolFee
     }
   }
-'''
+"""
 
-global_protocol_stats_query = '''
+global_protocol_stats_query = """
   query GlobalProtocolStats($request: GlobalProtocolStatsRequest) {
     globalProtocolStats(request: $request) {
       totalProfiles
@@ -451,4 +451,62 @@ global_protocol_stats_query = '''
       }
     }
   }
-'''
+"""
+
+profile_revenue_query = """
+  {0}: profileRevenue(request: {{profileId: "{1}"}}) {{
+    items {{
+        publication {{
+            ... on Post {{
+                id
+            }}
+            ... on Comment {{
+                id
+            }}
+            ... on Mirror {{
+                id
+            }}
+        }}
+        earnings {{
+            asset {{
+                name
+                symbol
+                decimals
+                address
+            }}
+            value
+        }}
+        protocolFee
+    }}
+    pageInfo {{
+        next
+        prev
+        totalCount
+    }}
+}}"""
+
+
+profile_timeseries = """
+query GlobalProtocolStats {{
+  globalProtocolStats(request: {{
+    fromTimestamp: {0},
+    toTimestamp: {1}
+  }}) {{
+    totalProfiles
+    totalBurntProfiles
+    totalPosts
+    totalMirrors
+    totalComments
+    totalCollects
+    totalFollows
+    totalRevenue {{
+      asset {{
+        name
+        symbol
+        decimals
+        address
+      }}
+      value
+    }}
+  }}
+}}"""
