@@ -49,7 +49,10 @@ layout = (
                                 dcc.Loading(
                                     id="post_history",
                                     children=[
-                                        dcc.Graph(id="post_history", config={"displayModeBar": False}),
+                                        dcc.Graph(
+                                            id="post_history",
+                                            config={"displayModeBar": False},
+                                        ),
                                     ],
                                 ),
                             ]
@@ -60,17 +63,44 @@ layout = (
                 dbc.Col(
                     [
                         html.Br(),
-                        dcc.Loading(
-                            id="timeseries_new_users",
-                            children=[
-                                dcc.Graph(id="timeseries_new_users", config={"displayModeBar": False}),
-                            ],
+                        dbc.Card(
+                            dbc.Col(
+                                [
+                                    dcc.Loading(
+                                        id="timeseries_new_users",
+                                        children=[
+                                            dcc.Graph(
+                                                id="timeseries_new_users",
+                                                style={"width": "90%", "height": "80%"},
+                                                config={"displayModeBar": False},
+                                            ),
+                                        ],
+                                    ),
+                                ],
+                                align="end",
+                                width=12,
+                            ),
+                            className="align-self-center",
                         ),
-                        dcc.Loading(
-                            id="timeseries_cum_users",
-                            children=[
-                                dcc.Graph(id="timeseries_cum_users", config={"displayModeBar": False}),
-                            ],
+                        html.Br(),
+                        dbc.Card(
+                            dbc.Col(
+                                [
+                                    dcc.Loading(
+                                        id="timeseries_cum_users",
+                                        children=[
+                                            dcc.Graph(
+                                                id="timeseries_cum_users",
+                                                style={"width": "90%", "height": "80%"},
+                                                config={"displayModeBar": False},
+                                            ),
+                                        ],
+                                    )
+                                ],
+                                align="end",
+                                width=12,
+                            ),
+                            className="align-self-center",
                         ),
                     ],
                     width=6,
@@ -106,7 +136,7 @@ def update_post_history_graph(profile_id):
     fig = go.Figure([go.Bar(x=df["createdAt"], y=counts)])
     fig.update_layout(
         template="simple_white",
-        margin=dict(t=35, b=0, l=0, r=0),
+        margin=dict(t=15, b=5, l=40, r=5),
     )
     fig.layout.plot_bgcolor = "#fff"
     fig.layout.paper_bgcolor = "#fff"
@@ -118,22 +148,46 @@ def update_post_history_graph(profile_id):
     Output("timeseries_new_users", "figure"),
     Output("timeseries_cum_users", "figure"),
     [
-        Input("date_picker_range", "value"),
-        Input("date_picker_range", "value"),
+        Input("date_picker_range", "start_date"),
+        Input("date_picker_range", "end_date"),
     ],
 )
-def update_timeseries_users(profile_id):
+def update_timeseries_users(start, end):
+    freq = "D"
+    start_list = pd.date_range(start, end).tolist()
+    end_list = [i + pd.Timedelta(1, unit=freq) for i in start_list]
+    start_list = [str(i) for i in start_list]
+    end_list = [str(i) for i in end_list]
 
-    df = f.GraphQLClient.get_profile_revenues(profile_id=profile_id)
-    df["createdAt"] = pd.to_datetime(df["createdAt"])
-    counts = df.groupby([pd.Grouper(key="createdAt", freq="D")]).size()
+    dfs = []
+    for start, end in zip(start_list, end_list):
+        dfs.append(f.GraphQLClient.get_timeseries(start=start, end=end))
 
-    fig = go.Figure([go.Bar(x=df["createdAt"], y=counts)])
-    fig.update_layout(
-        template="simple_white",
-        margin=dict(t=35, b=0, l=0, r=0),
+    timeseries = pd.concat(dfs)
+    timeseries["start"] = pd.to_datetime(timeseries["start"])
+    timeseries_cumsum = pd.concat([timeseries.iloc[:, :-3].cumsum(), timeseries.iloc[:, -3:]], axis=1)
+    # new users
+    fig_new_users = go.Figure(go.Bar(y=timeseries["data.globalProtocolStats.totalProfiles"], x=timeseries["start"]))
+    # cumulative users
+    fig_cum_users = go.Figure(
+        go.Scatter(y=timeseries_cumsum["data.globalProtocolStats.totalProfiles"], x=timeseries_cumsum["start"])
     )
-    fig.layout.plot_bgcolor = "#fff"
-    fig.layout.paper_bgcolor = "#fff"
 
-    return fig
+    fig_new_users.update_layout(
+        yaxis_title="Count",
+        xaxis_title="Date",
+        title="<b>New Users</b>",
+        title_x=0.5,
+        title_y=0.95,
+        margin=dict(t=50, b=5, l=70, r=-0),
+    )
+    fig_cum_users.update_layout(
+        yaxis_title="Total Users",
+        xaxis_title="Date",
+        title="<b>Cumulative Users</b>",
+        title_x=0.5,
+        title_y=0.95,
+        margin=dict(t=50, b=5, l=70, r=0),
+    )
+
+    return fig_new_users, fig_cum_users
