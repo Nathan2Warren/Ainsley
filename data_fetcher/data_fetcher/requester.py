@@ -74,14 +74,16 @@ class GraphQLClient:
         response = requests.post(cls.url, json={"query": query_string})
         if response.status_code == 200:
             content = json.loads(response.content)
-            profile_revenues = content["data"]
 
+            profile_revenues = content['data']
+            
             data = []
             for k, v in profile_revenues.items():
-                if len(v["items"]) > 0:
-                    data.extend(v["items"])
+                if len(v['items']) > 0:
+                    data.extend(v['items'])
             df = json_normalize(data)
-            df["profile_id"] = df["publication.id"].apply(lambda x: x.split("-")[0])
+            df['profile_id'] = df['publication.id'].apply(lambda x: x.split('-')[0])
+
             return df
         else:
             raise Exception(response.content.decode())
@@ -101,11 +103,18 @@ class GraphQLClient:
             return df
         else:
             raise Exception(response.content.decode())
-
-    @classmethod
+            
+    @classmethod        
     def get_publication_revenue(cls, publication_id: str):
-        variables = json.dumps({"request": {"publicationId": publication_id}})
-        response = requests.post(cls.url, json={"query": publication_revenue_query, "variables": variables})
+        variables = json.dumps({
+                        "request": {
+                            "publicationId": publication_id
+                        }
+                    })
+        response = requests.post(
+            cls.url, json={'query' : publication_revenue_query, 'variables' : variables}
+        )
+
         if response.status_code == 200:
             content = json.loads(response.content)
             revenue_data = content["data"]["publicationRevenue"]
@@ -138,7 +147,6 @@ class GraphQLClient:
             else:
                 raise Exception(response.content.decode())
         return json_normalize(publications)
-
 
 def convert_datetime_to_unix(d: str):
     unix_timestamp = int(time.mktime(datetime.fromisoformat(d).timetuple()))
