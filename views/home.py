@@ -95,25 +95,25 @@ layout = (
                             className="align-self-center",
                         ),
                         html.Br(),
-                        # dbc.Card(
-                        dbc.Col(
-                            [
-                                dcc.Loading(
-                                    id="timeseries_post_per_user",
-                                    children=[
-                                        dcc.Graph(
-                                            id="timeseries_post_per_user",
-                                            style={"width": "100%", "height": "80%"},
-                                            config={"displayModeBar": False},
-                                        ),
-                                    ],
-                                )
-                            ],
-                            align="end",
-                            width=12,
+                        dbc.Card(
+                            dbc.Col(
+                                [
+                                    dcc.Loading(
+                                        id="timeseries_post_per_user",
+                                        children=[
+                                            dcc.Graph(
+                                                id="timeseries_post_per_user",
+                                                style={"width": "90%", "height": "80%"},
+                                                config={"displayModeBar": False},
+                                            ),
+                                        ],
+                                    )
+                                ],
+                                align="end",
+                                width=12,
+                            ),
+                            className="align-self-center",
                         ),
-                        #     className="align-self-center",
-                        # ),
                     ],
                     width=5,
                 ),
@@ -138,14 +138,15 @@ layout = (
                             ),
                             className="align-self-center",
                         ),
+                        html.Br(),
                         dbc.Card(
                             dbc.Col(
                                 [
                                     dcc.Loading(
-                                        id="revenue_timeseries",
+                                        id="timeseries_revenue",
                                         children=[
                                             dcc.Graph(
-                                                id="revenue_timeseries",
+                                                id="timeseries_revenue",
                                                 style={"width": "90%", "height": "80%"},
                                                 config={"displayModeBar": False},
                                             ),
@@ -171,6 +172,7 @@ layout = (
     Output("timeseries_new_users", "figure"),
     Output("timeseries_cum_users", "figure"),
     Output("timeseries_post_per_user", "figure"),
+    Output("timeseries_revenue", "figure"),
     Output("total_profiles", "children"),
     Output("total_posts", "children"),
     Output("total_mirrors", "children"),
@@ -180,6 +182,8 @@ layout = (
     ],
 )
 def update_timeseries_users(start, end):
+    start_rev = start
+    end_rev = end
     freq = "D"
     start_list = pd.date_range(start, end).tolist()
     end_list = [i + pd.Timedelta(1, unit=freq) for i in start_list]
@@ -250,7 +254,20 @@ def update_timeseries_users(start, end):
         go.Scatter(y=timeseries_cumsum["post_per_user"], x=timeseries_cumsum["start"]),
     )
     # revenue
-    fig_revenue = go.Figure(go.Bar(y=timeseries["value"], x=timeseries["start"]))
+
+    timeseries_revenue = timeseries[~timeseries["asset.symbol"].isnull()]
+    timeseries_revenue_grouped = timeseries_revenue.groupby(["start", "end", "asset.symbol"]).sum().reset_index()
+
+    timeseries_revenue_grouped["value"] = timeseries_revenue_grouped["value"].cumsum()
+
+    date_range = pd.DataFrame({"start": pd.date_range(start_rev, end_rev)})
+    timeseries_revenue_fixed = pd.merge(date_range, timeseries_revenue_grouped, on="start", how="left")
+
+    timeseries_revenue_fixed["value"] = timeseries_revenue_fixed["value"].fillna(method="ffill")
+
+    fig_revenue = go.Figure(
+        go.Scatter(y=timeseries_revenue_fixed["value"], x=timeseries_revenue_fixed["start"]),
+    )
 
     fig_new_users.update_layout(
         yaxis_title="Count",
@@ -258,7 +275,7 @@ def update_timeseries_users(start, end):
         title="<b>New Users</b>",
         title_x=0.5,
         title_y=0.95,
-        margin=dict(t=50, b=5, l=70, r=-0),
+        margin=dict(t=50, b=5, l=70, r=0),
     )
     fig_cum_users.update_layout(
         yaxis_title="Total Users",
@@ -272,10 +289,33 @@ def update_timeseries_users(start, end):
     fig_post_per_user.update_layout(
         yaxis_title="Posts/User",
         xaxis_title="Date",
-        title="<b>Number of Posts per User</b>",
+        title="<b>Average Posts per User</b>",
         title_x=0.5,
         title_y=0.95,
-        margin=dict(t=50, b=5, l=70, r=30),
+        margin=dict(t=50, b=5, l=70, r=0),
     )
 
-    return fig_new_users, fig_cum_users, fig_post_per_user, f"{total_profiles}", f"{total_posts}", f"{total_mirrors}"
+    fig_revenue.update_layout(
+        yaxis_title="Cumulative Total",
+        xaxis_title="Date",
+        title="<b>Cumulative Protocol Revenue</b>",
+        title_x=0.5,
+        title_y=0.95,
+        margin=dict(t=50, b=5, l=70, r=0),
+        legend={
+            "traceorder": "normal",
+            "itemclick": "toggleothers",
+            "itemdoubleclick": "toggle",
+        },
+        legend_title_text="Currency",
+    )
+
+    return (
+        fig_new_users,
+        fig_cum_users,
+        fig_post_per_user,
+        fig_revenue,
+        f"{total_profiles}",
+        f"{total_posts}",
+        f"{total_mirrors}",
+    )
