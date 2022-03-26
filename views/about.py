@@ -17,16 +17,20 @@ layout = html.Div(
                     "Come here to see how many new profiles are added to the the network each day, and see the activity of posts, comments, follows, etc.",
                     className="blurb-1",
                 ),
+                html.P(
+                    "The profile explorer is used to quickly find tabulated data from all profiles.",
+                    className="blurb-1",
+                ),
             ],
             className="jumbotron text-center",
         ),
-        html.Section(
+        dbc.Row(
             [
                 html.H2(
                     "Technology Used",
                     className="lesser-header",
                 ),
-                html.Div(
+                dbc.Col(
                     [
                         html.Img(
                             src="assets/lens.ico",
@@ -43,7 +47,7 @@ layout = html.Div(
                         ),
                     ],
                 ),
-                html.Div(
+                dbc.Col(
                     [
                         html.Img(
                             src="assets/polygon.png",
@@ -60,7 +64,7 @@ layout = html.Div(
                         ),
                     ],
                 ),
-                html.Div(
+                dbc.Col(
                     [
                         html.Img(
                             src="assets/graphql.png",
@@ -101,13 +105,13 @@ layout = html.Div(
             ],
             className="jumbotron text-center",
         ),
-        html.Section(
+        dbc.Row(
             [
                 html.H2(
                     "Team",
                     className="lesser-header",
                 ),
-                html.Div(
+                dbc.Col(
                     [
                         html.Img(
                             src="assets/trashman.png",
@@ -124,7 +128,7 @@ layout = html.Div(
                         ),
                     ],
                 ),
-                html.Div(
+                dbc.Col(
                     [
                         html.Img(
                             src="assets/benSnow.png",
@@ -141,7 +145,7 @@ layout = html.Div(
                         ),
                     ],
                 ),
-                html.Div(
+                dbc.Col(
                     [
                         html.Img(
                             src="assets/nate_smile.png",
@@ -159,6 +163,7 @@ layout = html.Div(
                     ],
                 ),
             ],
+            className="jumbotron text-center",
         ),
     ],
 )
