@@ -8,6 +8,7 @@ import plotly
 import plotly.express as px
 import plotly.graph_objects as go
 from dash import dcc, html
+import dash_table as dtt
 from dash.dependencies import Input, Output
 
 import data_fetcher as f
@@ -64,23 +65,27 @@ def update_profile_id_select(profile_options):
 
 
 @app.callback(
-    Output("post_history", "figure"),
+    Output("post_history", "children"),
     [
         Input("profile_options", "value"),
     ],
 )
 def update_post_history_graph(profile_id):
 
-    df = f.GraphQLClient.get_publications_by_profile(profile_id=profile_id)
-    df["createdAt"] = pd.to_datetime(df["createdAt"])
-    counts = df.groupby([pd.Grouper(key="createdAt", freq="D")]).size()
-
-    fig = go.Figure([go.Bar(x=df["createdAt"], y=counts)])
-    fig.update_layout(
-        template="simple_white",
-        margin=dict(t=15, b=5, l=40, r=5),
+    df = f.GraphQLClient._get_data_for_all_profiles(normalize=True)
+    top3_df = dtt.DataTable(
+        data=df.to_dict,
+        columns=[{"name": i, "id": i} for i in df.columns],
+        style_header={"backgroundColor": "#CF7575"},
+        style_cell={"backgroundColor": "#CF7575", "color": "white"},
     )
-    fig.layout.plot_bgcolor = "#fff"
-    fig.layout.paper_bgcolor = "#fff"
 
-    return fig
+    # fig = go.Figure([go.Bar(x=df["createdAt"], y=counts)])
+    # fig.update_layout(
+    #     template="simple_white",
+    #     margin=dict(t=15, b=5, l=40, r=5),
+    # )
+    # top3_df.layout.plot_bgcolor = "#fff"
+    # top3_df.layout.paper_bgcolor = "#fff"
+
+    return top3_df
