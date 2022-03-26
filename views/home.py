@@ -19,16 +19,6 @@ profile_ids = f.GraphQLClient.get_existing_profile_ids()
 profile_options = [{"label": p_id, "value": p_id} for p_id in profile_ids]
 
 
-def unixTimeMillis(dt):
-    """Convert datetime to unix timestamp"""
-    return int(time.mktime(time.timetuple()))
-
-
-def unixToDatetime(unix):
-    """Convert unix timestamp to datetime."""
-    return pd.to_datetime(unix, unit="s")
-
-
 layout = (
     dbc.Container(
         dbc.Row(
@@ -77,6 +67,7 @@ layout = (
                                     ]
                                 ),
                             ],
+                            color="#A673EF",
                         ),
                     ],
                     className="sidebar",
@@ -104,25 +95,25 @@ layout = (
                             className="align-self-center",
                         ),
                         html.Br(),
-                        dbc.Card(
-                            dbc.Col(
-                                [
-                                    dcc.Loading(
-                                        id="timeseries_post_per_user",
-                                        children=[
-                                            dcc.Graph(
-                                                id="timeseries_post_per_user",
-                                                style={"width": "90%", "height": "80%"},
-                                                config={"displayModeBar": False},
-                                            ),
-                                        ],
-                                    )
-                                ],
-                                align="end",
-                                width=12,
-                            ),
-                            className="align-self-center",
+                        # dbc.Card(
+                        dbc.Col(
+                            [
+                                dcc.Loading(
+                                    id="timeseries_post_per_user",
+                                    children=[
+                                        dcc.Graph(
+                                            id="timeseries_post_per_user",
+                                            style={"width": "100%", "height": "80%"},
+                                            config={"displayModeBar": False},
+                                        ),
+                                    ],
+                                )
+                            ],
+                            align="end",
+                            width=12,
                         ),
+                        #     className="align-self-center",
+                        # ),
                     ],
                     width=5,
                 ),
@@ -136,6 +127,25 @@ layout = (
                                         children=[
                                             dcc.Graph(
                                                 id="timeseries_new_users",
+                                                style={"width": "90%", "height": "80%"},
+                                                config={"displayModeBar": False},
+                                            ),
+                                        ],
+                                    )
+                                ],
+                                align="end",
+                                width=12,
+                            ),
+                            className="align-self-center",
+                        ),
+                        dbc.Card(
+                            dbc.Col(
+                                [
+                                    dcc.Loading(
+                                        id="revenue_timeseries",
+                                        children=[
+                                            dcc.Graph(
+                                                id="revenue_timeseries",
                                                 style={"width": "90%", "height": "80%"},
                                                 config={"displayModeBar": False},
                                             ),
@@ -182,7 +192,39 @@ def update_timeseries_users(start, end):
 
     timeseries = pd.concat(dfs)
     timeseries["start"] = pd.to_datetime(timeseries["start"])
-    timeseries_cumsum = pd.concat([timeseries.iloc[:, :-3].cumsum(), timeseries.iloc[:, -3:]], axis=1)
+    mask = timeseries["data.globalProtocolStats.totalRevenue"].apply(lambda x: len(x)) > 0
+    timeseries_full, timeseries_blank = timeseries[mask], timeseries[~mask]
+
+    revenue = timeseries[timeseries["data.globalProtocolStats.totalRevenue"].apply(lambda x: len(x)) > 0][
+        "data.globalProtocolStats.totalRevenue"
+    ]
+    revenue_df = pd.json_normalize(revenue.apply(lambda x: x[0]))
+
+    # unpack revenue dicts
+    new_ts = pd.concat([timeseries_full.reset_index(drop=True), revenue_df.reset_index(drop=True)], axis=1)
+    timeseries = pd.concat(
+        [new_ts.reset_index(drop=True), timeseries_blank.reset_index(drop=True)], axis=0
+    ).sort_values("start")
+
+    timeseries.loc[timeseries["value"].isnull(), "value"] = 0
+
+    timeseries["value"] = timeseries["value"].astype("float64")
+    timeseries_cumsum = timeseries.copy()
+
+    cum_sum_list = [
+        "data.globalProtocolStats.totalProfiles",
+        "data.globalProtocolStats.totalBurntProfiles",
+        "data.globalProtocolStats.totalPosts",
+        "data.globalProtocolStats.totalMirrors",
+        "data.globalProtocolStats.totalComments",
+        "data.globalProtocolStats.totalCollects",
+        "data.globalProtocolStats.totalFollows",
+        "data.globalProtocolStats.totalRevenue",
+        "value",
+    ]
+
+    for i in cum_sum_list:
+        timeseries_cumsum[i] = timeseries_cumsum[i].cumsum()
 
     # post per user
     timeseries_cumsum["post_per_user"] = (
@@ -196,6 +238,7 @@ def update_timeseries_users(start, end):
     total_mirrors = timeseries_cumsum.iloc[-1]["data.globalProtocolStats.totalMirrors"]
 
     ### Plots ###
+
     # new users
     fig_new_users = go.Figure(go.Bar(y=timeseries["data.globalProtocolStats.totalProfiles"], x=timeseries["start"]))
     # cumulative users
@@ -203,7 +246,11 @@ def update_timeseries_users(start, end):
         go.Scatter(y=timeseries_cumsum["data.globalProtocolStats.totalProfiles"], x=timeseries_cumsum["start"])
     )
     # post per user
-    fig_post_per_user = go.Figure(go.Scatter(y=timeseries_cumsum["post_per_user"], x=timeseries_cumsum["start"]))
+    fig_post_per_user = go.Figure(
+        go.Scatter(y=timeseries_cumsum["post_per_user"], x=timeseries_cumsum["start"]),
+    )
+    # revenue
+    fig_revenue = go.Figure(go.Bar(y=timeseries["value"], x=timeseries["start"]))
 
     fig_new_users.update_layout(
         yaxis_title="Count",
@@ -228,7 +275,7 @@ def update_timeseries_users(start, end):
         title="<b>Number of Posts per User</b>",
         title_x=0.5,
         title_y=0.95,
-        margin=dict(t=50, b=5, l=70, r=0),
+        margin=dict(t=50, b=5, l=70, r=30),
     )
 
     return fig_new_users, fig_cum_users, fig_post_per_user, f"{total_profiles}", f"{total_posts}", f"{total_mirrors}"
