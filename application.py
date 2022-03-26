@@ -8,7 +8,7 @@ from dash.dependencies import Input, Output
 
 # Own packages (must be in same directory as index.py)
 from app import app, server
-from views import home, page1, page2
+from views import about, home, profiles
 
 server = app.server
 
@@ -44,7 +44,7 @@ app.layout = html.Div(
                     dbc.NavbarBrand(
                         [
                             html.Img(
-                                src="assets/lens.ico",
+                                src="assets/navbar_logo.png",
                                 height="30px",
                                 className="d-inline-block align-top",
                             ),
@@ -60,14 +60,14 @@ app.layout = html.Div(
                             dbc.NavItem(
                                 dbc.NavLink(
                                     "Profile Explorer",
-                                    href="/page1",
+                                    href="/profiles",
                                     active="exact",
                                 )
                             ),
                             dbc.NavItem(
                                 dbc.NavLink(
                                     "About",
-                                    href="/page2",
+                                    href="/about",
                                     active="exact",
                                 )
                             ),
@@ -93,10 +93,10 @@ app.layout = html.Div(
 def display_page(pathname):
     if pathname == "/":
         return home.layout
-    if pathname == "/page1":
-        return page1.layout
-    if pathname == "/page2":
-        return page2.layout
+    if pathname == "/profiles":
+        return profiles.layout
+    if pathname == "/about":
+        return about.layout
     else:
         return html.Div(
             [html.H1("404: Page Not Found", className="jumbotron-heading")],

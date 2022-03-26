@@ -6,6 +6,6 @@ app = dash.Dash(
     suppress_callback_exceptions=True,
     external_stylesheets=[dbc.themes.BOOTSTRAP],
 )
-app.title = "Lens Dashboard"
-app._favicon = "lens.ico"
+app.title = "Ainsley Report"
+app._favicon = "graph_favicon.ico"
 server = app.server

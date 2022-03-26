@@ -1,8 +1,15 @@
 body {
     font-family: sans-serif;
-    background: #0D6008;
+    background: #DCD5FF;
 
 }
 h1, h2, h3, h4, h5, h6 {
     color: #331684;
+    padding-bottom: 5px;
+    font-weight: bold;
+
+}
+
+p {
+  padding-bottom: 10px
 }
