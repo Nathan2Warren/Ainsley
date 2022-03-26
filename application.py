@@ -48,7 +48,7 @@ app.layout = html.Div(
                                 height="30px",
                                 className="d-inline-block align-top",
                             ),
-                            " Lens Dashboard",
+                            " Ainsley Report",
                         ],
                         className="ml-2",
                         external_link=False,

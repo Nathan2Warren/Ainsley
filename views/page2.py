@@ -5,11 +5,11 @@ layout = html.Div(
         html.Section(
             [
                 html.H1(
-                    "Welcome to the Ainsley Report",
+                    "Ainsley Report",
                     className="jumbotron-heading",
                 ),
                 html.P(
-                    "Description 1. " "Desc 2 " "Desc 3 " "Desc 4 " "Desc 5 " "Desc 6",
+                    "All the best metrics to follow adoption of the Lens Protocol in one place! These metrics are crtical to gauging the health of the social networking protocol.",
                     className="lead text-muted",
                 ),
             ],
