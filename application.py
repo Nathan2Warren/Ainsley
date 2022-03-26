@@ -44,7 +44,7 @@ app.layout = html.Div(
                     dbc.NavbarBrand(
                         [
                             html.Img(
-                                src="assets/lens.ico",
+                                src="assets/navbar_logo.png",
                                 height="30px",
                                 className="d-inline-block align-top",
                             ),
