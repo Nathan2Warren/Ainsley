@@ -3,13 +3,12 @@ import os
 
 import dash
 import dash_bootstrap_components as dbc
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc, html
 from dash.dependencies import Input, Output
 
 # Own packages (must be in same directory as index.py)
 from app import app, server
-from views import home, page1, page2, page3, page4
+from views import home, page1, page2
 
 server = app.server
 
@@ -49,7 +48,7 @@ app.layout = html.Div(
                                 height="30px",
                                 className="d-inline-block align-top",
                             ),
-                            " Lens Dashboard",
+                            " Ainsley Report",
                         ],
                         className="ml-2",
                         external_link=False,
@@ -60,29 +59,15 @@ app.layout = html.Div(
                             dbc.NavItem(dbc.NavLink("Home", href="/", active="exact")),
                             dbc.NavItem(
                                 dbc.NavLink(
-                                    "page1",
+                                    "Profile Explorer",
                                     href="/page1",
                                     active="exact",
                                 )
                             ),
                             dbc.NavItem(
                                 dbc.NavLink(
-                                    "page2",
+                                    "About",
                                     href="/page2",
-                                    active="exact",
-                                )
-                            ),
-                            dbc.NavItem(
-                                dbc.NavLink(
-                                    "page3",
-                                    href="/page3",
-                                    active="exact",
-                                )
-                            ),
-                            dbc.NavItem(
-                                dbc.NavLink(
-                                    "page4",
-                                    href="/page4",
                                     active="exact",
                                 )
                             ),
@@ -112,10 +97,6 @@ def display_page(pathname):
         return page1.layout
     if pathname == "/page2":
         return page2.layout
-    if pathname == "/page3":
-        return page3.layout
-    if pathname == "/page4":
-        return page4.layout
     else:
         return html.Div(
             [html.H1("404: Page Not Found", className="jumbotron-heading")],
