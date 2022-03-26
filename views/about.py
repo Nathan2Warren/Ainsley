@@ -83,7 +83,28 @@ layout = html.Div(
         html.Section(
             [
                 html.H2(
-                    "About",
+                    "Further Work",
+                    className="jumbotron-heading",
+                ),
+                html.P(
+                    "Collect Feedback: We want to hear from the Lens Community to see if we are collecting and presenting the most useful data",
+                    className="blurb-1",
+                ),
+                html.P(
+                    "Front End Improvements: Continue to utilize Finity to improve front end design",
+                    className="blurb-1",
+                ),
+                html.P(
+                    "Go Live! We want to deploy this application and on a webserver and present the data when Lens Protocol is on the mainnet",
+                    className="blurb-1",
+                ),
+            ],
+            className="jumbotron text-center",
+        ),
+        html.Section(
+            [
+                html.H2(
+                    "Team",
                     className="lesser-header",
                 ),
                 html.Div(
