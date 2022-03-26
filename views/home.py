@@ -44,6 +44,7 @@ layout = (
                             style={},
                         ),
                         html.Br(),
+                        dbc.Row(html.Br()),
                         dbc.Card(
                             [
                                 dbc.CardBody(
