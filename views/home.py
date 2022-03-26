@@ -58,7 +58,6 @@ layout = (
                             [
                                 dbc.CardBody(
                                     [
-                                        html.Br(),
                                         html.H6("Stats"),
                                         html.P(
                                             "Number of Profiles",
@@ -81,30 +80,10 @@ layout = (
                         ),
                     ],
                     className="sidebar",
-                    width=3,
+                    width=2,
                 ),
                 dbc.Col(
                     [
-                        dbc.Card(
-                            dbc.Col(
-                                [
-                                    dcc.Loading(
-                                        id="timeseries_new_users",
-                                        children=[
-                                            dcc.Graph(
-                                                id="timeseries_new_users",
-                                                style={"width": "90%", "height": "80%"},
-                                                config={"displayModeBar": False},
-                                            ),
-                                        ],
-                                    ),
-                                ],
-                                align="end",
-                                width=12,
-                            ),
-                            className="align-self-center",
-                        ),
-                        html.Br(),
                         dbc.Card(
                             dbc.Col(
                                 [
@@ -117,7 +96,7 @@ layout = (
                                                 config={"displayModeBar": False},
                                             ),
                                         ],
-                                    )
+                                    ),
                                 ],
                                 align="end",
                                 width=12,
@@ -145,7 +124,31 @@ layout = (
                             className="align-self-center",
                         ),
                     ],
-                    width=9,
+                    width=5,
+                ),
+                dbc.Col(
+                    [
+                        dbc.Card(
+                            dbc.Col(
+                                [
+                                    dcc.Loading(
+                                        id="timeseries_new_users",
+                                        children=[
+                                            dcc.Graph(
+                                                id="timeseries_new_users",
+                                                style={"width": "90%", "height": "80%"},
+                                                config={"displayModeBar": False},
+                                            ),
+                                        ],
+                                    )
+                                ],
+                                align="end",
+                                width=12,
+                            ),
+                            className="align-self-center",
+                        ),
+                    ],
+                    width=5,
                 ),
             ],
         ),
