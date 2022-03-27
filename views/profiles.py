@@ -45,22 +45,3 @@ layout = (
         },
     ),
 )
-
-
-# layout = (
-#     dbc.Container(
-#         dbc.Row(
-#             [
-#                 dbc.Col(
-#                     dtt.DataTable(
-#                         data=df.to_dict,
-#                         columns=[{"name": i, "id": i} for i in df.columns],
-#                         style_header={"backgroundColor": "#CF7575"},
-#                         style_cell={"backgroundColor": "#CF7575", "color": "white"},
-#                     ),
-#                     width=12,
-#                 ),
-#             ],
-#         ),
-#     ),
-# )
