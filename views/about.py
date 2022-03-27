@@ -14,11 +14,11 @@ layout = html.Div(
                     className="blurb-1",
                 ),
                 html.P(
-                    "Come here to see how many new profiles are added to the the network each day, and see the activity of posts, comments, follows, etc.",
+                    "The homepage shows time series data of users and revenue as well as totals of key metrics.",
                     className="blurb-1",
                 ),
                 html.P(
-                    "The profile explorer is used to quickly find tabulated data from all profiles.",
+                    "The profile explorer is used to quickly find tabulated data from all profiles that have names that are not null.",
                     className="blurb-1",
                 ),
             ],
@@ -91,11 +91,15 @@ layout = html.Div(
                     className="jumbotron-heading",
                 ),
                 html.P(
-                    "Collect Feedback: We want to hear from the Lens Community to see if we are collecting and presenting the most useful data",
+                    "Collect Feedback: We want to hear from the Lens Community to see if we are collecting and presenting the most useful data, and to make our app the best it can be!",
                     className="blurb-1",
                 ),
                 html.P(
-                    "Front End Improvements: Continue to utilize Finity to improve front end design",
+                    "Front End Improvements: Continue to utilize Finity to improve front end design.",
+                    className="blurb-1",
+                ),
+                html.P(
+                    "Profile Explorer: Add a search function and pivot table capability to improve the profile directory usefulness.",
                     className="blurb-1",
                 ),
                 html.P(
