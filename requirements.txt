@@ -2,7 +2,6 @@ dash_core_components==2.0.0
 dash_html_components==2.0.0
 dash==2.3.0
 dash_bootstrap_components==1.0.3
-dash_table==5.0.0
 black==22.1.0
 numpy==1.22.3
 pandas==1.4.1
